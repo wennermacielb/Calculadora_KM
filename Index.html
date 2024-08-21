@@ -7,7 +7,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #000; /* Fundo preto */
+            color: #fff; /* Texto branco */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -15,14 +16,16 @@
             margin: 0;
         }
         .container {
-            background-color: white;
+            background-color: rgba(255, 255, 255, 0.7); /* Fundo branco com 70% de opacidade */
+            color: #000; /* Texto preto */
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            width: 100%;
+            max-width: 400px; /* Largura máxima para dispositivos grandes */
             text-align: center;
         }
-        input {
+        input, select {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
@@ -40,6 +43,8 @@
             border-radius: 5px;
             cursor: pointer;
             margin-top: 20px;
+            width: 100%;
+            box-sizing: border-box;
         }
         button:hover {
             background-color: #45a049;
@@ -54,6 +59,7 @@
             margin-bottom: 10px;
             display: inline-block;
             width: 100%;
+            box-sizing: border-box;
         }
         .btn-retorno.active {
             background-color: #0056b3;
@@ -64,20 +70,83 @@
             color: #555;
             text-align: center;
             border-top: 1px solid #ddd;
-            padding-top: 10px;
+            padding: 10px;
+            font-weight: bold; /* Negrito */
+            background-color: #e7f3e7; /* Cor de fundo suave */
+            border-radius: 5px;
+        }
+        .header {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-group:first-of-type {
+            margin-top: 40px; /* Espaçamento adicional para o primeiro campo do formulário */
+        }
+
+        /* Regras de estilo para responsividade */
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 15px;
+            }
+            .header {
+                font-size: 16px;
+            }
+            input, select, button {
+                font-size: 14px;
+                padding: 10px;
+            }
+            .lembrete {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Calculadora de Km por R$ com Retorno</h2>
-    <label for="km">Distância (Km):</label>
-    <input type="text" id="km" placeholder="Digite a distância em km" oninput="formatKm()">
+    <div class="header">Don Alho</div>
+    
+    <div class="form-group">
+        <label for="endereco">Endereço:</label>
+        <input type="text" id="endereco" placeholder="Digite o endereço">
+    </div>
+
+    <div class="form-group">
+        <label for="numero">Número:</label>
+        <input type="text" id="numero" placeholder="Número">
+    </div>
+
+    <div class="form-group">
+        <label for="complemento">Complemento:</label>
+        <input type="text" id="complemento" placeholder="Complemento">
+    </div>
+
+    <div class="form-group">
+        <label for="cep">CEP:</label>
+        <input type="text" id="cep" placeholder="CEP">
+    </div>
+    
+    <div class="form-group">
+        <label for="km">Distância (Km):</label>
+        <input type="text" id="km" placeholder="Digite a distância em km" oninput="formatKm()">
+    </div>
+    
+    <div class="form-group">
+        <label for="valor">Valor da Entrega:</label>
+        <input type="text" id="valor" readonly>
+    </div>
     
     <button id="btnRetorno" class="btn-retorno" onclick="toggleRetorno()">Retorno</button>
     
     <button onclick="calcular()">Calcular</button>
+    
+    <button onclick="enviar()">Enviar</button>
     
     <p id="resultado"></p>
     
@@ -104,15 +173,18 @@
         } else {
             kmInput.value = ""; // Limpa o campo se não houver valor
         }
+        calcular(); // Atualiza o valor da entrega automaticamente
     }
 
     function calcular() {
         const kmInput = document.getElementById('km').value;
         const km = parseFloat(kmInput.replace(" Km", "")); // Remove o " Km" antes de calcular
         let preco = 0;
+        let precoRetorno = 0;
 
         if (isNaN(km) || km <= 0) {
             document.getElementById('resultado').innerText = "Por favor, insira uma distância válida.";
+            document.getElementById('valor').value = "";
             return;
         }
 
@@ -139,12 +211,33 @@
             preco = 6.99 + (km - 5) * 0.75; // A partir de 5 km, adicionar R$0,75 por km
         }
 
-        // Se o retorno estiver ativado, adicionar o custo do retorno (R$0,13 por km)
+        // Se o retorno estiver ativado, calcular o custo do retorno (R$0,13 por km)
         if (incluirRetorno) {
-            preco += km * 0.13;
+            precoRetorno = km * 0.13;
+            preco += precoRetorno;
         }
 
+        document.getElementById('valor').value = `R$ ${preco.toFixed(2)}`;
         document.getElementById('resultado').innerText = `O valor total é: R$ ${preco.toFixed(2)}`;
+        if (incluirRetorno) {
+            document.getElementById('resultado').innerText += `\nValor do retorno: R$ ${precoRetorno.toFixed(2)}`;
+        }
+    }
+
+    function enviar() {
+        const endereco = document.getElementById('endereco').value;
+        const numero = document.getElementById('numero').value;
+        const complemento = document.getElementById('complemento').value;
+        const cep = document.getElementById('cep').value;
+        const kmInput = document.getElementById('km').value;
+        const valor = document.getElementById('valor').value;
+
+        if (!endereco || !numero || !cep || !kmInput || !valor) {
+            alert("Por favor, preencha todos os campos.");
+            return;
+        }
+
+        alert(`Endereço de Entrega: ${endereco}, ${numero}, ${complemento}, ${cep}\nDistância: ${kmInput}\nValor: ${valor}`);
     }
 </script>
 
