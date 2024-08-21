@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Km por R$ com Retorno</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-size: 16px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .btn-retorno {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            display: inline-block;
+            width: 100%;
+        }
+        .btn-retorno.active {
+            background-color: #0056b3;
+        }
+        .lembrete {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Calculadora de Km por R$ com Retorno</h2>
+    <label for="km">Distância (Km):</label>
+    <input type="text" id="km" placeholder="Digite a distância em km" oninput="formatKm()">
+    
+    <button id="btnRetorno" class="btn-retorno" onclick="toggleRetorno()">Retorno</button>
+    
+    <button onclick="calcular()">Calcular</button>
+    
+    <p id="resultado"></p>
+    
+    <div class="lembrete">
+        Caso o motoboy precise retornar ao estabelecimento para buscar um produto esquecido, será cobrada uma taxa adicional equivalente a uma corrida normal.
+    </div>
+</div>
+
+<script>
+    let incluirRetorno = false;
+
+    function toggleRetorno() {
+        incluirRetorno = !incluirRetorno;
+        const btn = document.getElementById('btnRetorno');
+        btn.classList.toggle('active', incluirRetorno);
+        calcular(); // Chama o cálculo automaticamente ao clicar no botão de retorno
+    }
+
+    function formatKm() {
+        const kmInput = document.getElementById('km');
+        let kmValue = kmInput.value.replace(/[^0-9.]/g, ''); // Remove tudo que não for número ou ponto
+        if (kmValue) {
+            kmInput.value = kmValue + " Km"; // Adiciona "Km" ao valor
+        } else {
+            kmInput.value = ""; // Limpa o campo se não houver valor
+        }
+    }
+
+    function calcular() {
+        const kmInput = document.getElementById('km').value;
+        const km = parseFloat(kmInput.replace(" Km", "")); // Remove o " Km" antes de calcular
+        let preco = 0;
+
+        if (isNaN(km) || km <= 0) {
+            document.getElementById('resultado').innerText = "Por favor, insira uma distância válida.";
+            return;
+        }
+
+        // Cálculo do preço base por km
+        if (km <= 5) {
+            switch (true) {
+                case (km == 1):
+                    preco = 6.50;
+                    break;
+                case (km == 2):
+                    preco = 6.60;
+                    break;
+                case (km == 3):
+                    preco = 6.70;
+                    break;
+                case (km == 4):
+                    preco = 6.80;
+                    break;
+                case (km == 5):
+                    preco = 6.99;
+                    break;
+            }
+        } else {
+            preco = 6.99 + (km - 5) * 0.75; // A partir de 5 km, adicionar R$0,75 por km
+        }
+
+        // Se o retorno estiver ativado, adicionar o custo do retorno (R$0,13 por km)
+        if (incluirRetorno) {
+            preco += km * 0.13;
+        }
+
+        document.getElementById('resultado').innerText = `O valor total é: R$ ${preco.toFixed(2)}`;
+    }
+</script>
+
+</body>
+</html>
