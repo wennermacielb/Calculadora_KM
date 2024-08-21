@@ -116,7 +116,7 @@
 <body>
 
 <div class="container">
-    <div class="header">Don Alho</div>
+    <div class="header">WM ENTREGAS</div>
     
     <div class="form-group">
         <label for="km">Distância (Km):</label>
@@ -135,6 +135,7 @@
     <p id="resultado"></p>
     
     <div class="lembrete">
+        Lembrando que cada parada adicionada será cobrada R$3,00.<br>
         Caso o motoboy precise retornar ao estabelecimento para buscar um produto esquecido, será cobrada uma taxa adicional equivalente a uma corrida normal.
     </div>
 
@@ -210,7 +211,6 @@
             document.getElementById('resultado').innerText += `\nValor do retorno: R$ ${precoRetorno.toFixed(2)}`;
         }
         
-        // Remove o link do WhatsApp
         document.getElementById('resultado-info').innerHTML = '';
     }
 </script>
