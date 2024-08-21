@@ -87,6 +87,12 @@
         .form-group:first-of-type {
             margin-top: 40px; /* Espaçamento adicional para o primeiro campo do formulário */
         }
+        .resultado-info {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #000;
+            text-align: left;
+        }
 
         /* Regras de estilo para responsividade */
         @media (max-width: 600px) {
@@ -114,7 +120,7 @@
     
     <div class="form-group">
         <label for="endereco">Endereço:</label>
-        <input type="text" id="endereco" placeholder="Digite o endereço">
+        <input type="text" id="endereco" placeholder="Digite o endereço" oninput="atualizarResultado()">
     </div>
 
     <div class="form-group">
@@ -129,7 +135,7 @@
 
     <div class="form-group">
         <label for="cep">CEP:</label>
-        <input type="text" id="cep" placeholder="CEP">
+        <input type="text" id="cep" placeholder="CEP" oninput="atualizarResultado()">
     </div>
     
     <div class="form-group">
@@ -146,17 +152,22 @@
     
     <button onclick="calcular()">Calcular</button>
     
-    <button onclick="enviar()">Enviar</button>
+    <a id="enviar-link" href="#" target="_blank">
+        <button>Enviar</button>
+    </a>
     
     <p id="resultado"></p>
     
     <div class="lembrete">
         Caso o motoboy precise retornar ao estabelecimento para buscar um produto esquecido, será cobrada uma taxa adicional equivalente a uma corrida normal.
     </div>
+
+    <div id="resultado-info" class="resultado-info"></div>
 </div>
 
 <script>
     let incluirRetorno = false;
+    let rotaNumero = 1; // Número inicial da rota
 
     function toggleRetorno() {
         incluirRetorno = !incluirRetorno;
@@ -176,7 +187,29 @@
         calcular(); // Atualiza o valor da entrega automaticamente
     }
 
+    function atualizarResultado() {
+        const endereco = document.getElementById('endereco').value;
+        const cep = document.getElementById('cep').value;
+        const resultadoInfo = document.getElementById('resultado-info');
+
+        let resultadoTexto = '';
+
+        if (endereco) {
+            resultadoTexto += `Endereço: ${endereco}<br>`;
+        }
+
+        if (cep) {
+            resultadoTexto += `CEP: ${cep}<br>`;
+        }
+
+        resultadoInfo.innerHTML = resultadoTexto;
+    }
+
     function calcular() {
+        const endereco = document.getElementById('endereco').value;
+        const numero = document.getElementById('numero').value;
+        const complemento = document.getElementById('complemento').value;
+        const cep = document.getElementById('cep').value;
         const kmInput = document.getElementById('km').value;
         const km = parseFloat(kmInput.replace(" Km", "")); // Remove o " Km" antes de calcular
         let preco = 0;
@@ -211,7 +244,7 @@
             preco = 6.99 + (km - 5) * 0.75; // A partir de 5 km, adicionar R$0,75 por km
         }
 
-        // Se o retorno estiver ativado, calcular o custo do retorno (R$0,13 por km)
+// Se o retorno estiver ativado, calcular o custo do retorno (R$0,13 por km)
         if (incluirRetorno) {
             precoRetorno = km * 0.13;
             preco += precoRetorno;
@@ -222,9 +255,12 @@
         if (incluirRetorno) {
             document.getElementById('resultado').innerText += `\nValor do retorno: R$ ${precoRetorno.toFixed(2)}`;
         }
+        
+        // Atualiza o link do WhatsApp
+        atualizarLinkWhatsApp();
     }
 
-    function enviar() {
+    function atualizarLinkWhatsApp() {
         const endereco = document.getElementById('endereco').value;
         const numero = document.getElementById('numero').value;
         const complemento = document.getElementById('complemento').value;
@@ -232,12 +268,12 @@
         const kmInput = document.getElementById('km').value;
         const valor = document.getElementById('valor').value;
 
-        if (!endereco || !numero || !cep || !kmInput || !valor) {
-            alert("Por favor, preencha todos os campos.");
-            return;
-        }
+        const mensagem = `ENTREGA!\nENDEREÇO: ${endereco}\nN°: ${numero}\nCOMPLEMENTO: ${complemento}\n\nDISTÂNCIA DA CORRIDA: ${kmInput}\nVALOR DA CORRIDA: ${valor}\n\nRota ${rotaNumero}`;
+        
+        const linkWhatsApp = `https://api.whatsapp.com/send?phone=5566992353669&text=${encodeURIComponent(mensagem)}`;
+        document.getElementById('enviar-link').href = linkWhatsApp;
 
-        alert(`Endereço de Entrega: ${endereco}, ${numero}, ${complemento}, ${cep}\nDistância: ${kmInput}\nValor: ${valor}`);
+        rotaNumero++; // Incrementa o número da rota para a próxima
     }
 </script>
 
